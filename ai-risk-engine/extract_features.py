@@ -2,12 +2,25 @@ import json
 from pathlib import Path
 
 def safe_load(path):
-    if not Path(path).exists():
-        return None
-    with open(path, "r") as f:
-        return json.load(f)
+    p = Path(path)
 
-# Load scan outputs
+    # File does not exist
+    if not p.exists():
+        return None
+
+    # File exists but is empty
+    if p.stat().st_size == 0:
+        return None
+
+    try:
+        with open(p, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        # Corrupt or invalid JSON
+        return None
+
+
+# ================= LOAD FILES =================
 semgrep = safe_load("semgrep.json") or {}
 trivy = safe_load("trivy.json") or {}
 gitleaks = safe_load("gitleaks.json") or []
@@ -28,28 +41,28 @@ for r in semgrep_results:
     elif severity == "WARNING":
         semgrep_high += 1
 
-    if "secret" in rule_id or "password" in rule_id or "token" in rule_id:
+    if any(x in rule_id for x in ["secret", "password", "token"]):
         semgrep_secrets += 1
+
 
 # ================= TRIVY =================
 trivy_critical = 0
 trivy_high = 0
 
 for result in trivy.get("Results", []):
-    vulns = result.get("Vulnerabilities") or []
-    for v in vulns:
+    for v in result.get("Vulnerabilities") or []:
         sev = v.get("Severity", "").upper()
         if sev == "CRITICAL":
             trivy_critical += 1
         elif sev == "HIGH":
             trivy_high += 1
 
+
 # ================= GITLEAKS =================
-# gitleaks.json is an array of findings
 gitleaks_findings = len(gitleaks) if isinstance(gitleaks, list) else 0
 
+
 # ================= FEATURE VECTOR =================
-# Order MUST match training
 features = [
     semgrep_critical,
     semgrep_high,
@@ -59,5 +72,4 @@ features = [
     gitleaks_findings
 ]
 
-# Jenkins-friendly output
 print(" ".join(map(str, features)))

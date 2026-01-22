@@ -1,5 +1,5 @@
 # ----------------------------------------
-# Explicit, pinned Python version
+# Base image
 # ----------------------------------------
 FROM python:3.13.11-slim
 
@@ -10,28 +10,28 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # ----------------------------------------
-# Working directory inside container
+# Working directory
 # ----------------------------------------
 WORKDIR /app
 
 # ----------------------------------------
-# Minimal system dependencies
-# (needed for some Python wheels)
+# System dependencies (build only)
 # ----------------------------------------
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------------------
-# Python dependencies
+# Python dependencies (cached layer)
 # ----------------------------------------
-COPY app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # ----------------------------------------
-# Application source code
+# Application source (changes most often)
 # ----------------------------------------
-COPY app/ .
+COPY app/ ./app
 
 # ----------------------------------------
 # Expose Flask port
@@ -39,6 +39,6 @@ COPY app/ .
 EXPOSE 5000
 
 # ----------------------------------------
-# Start the Flask application
+# Start application
 # ----------------------------------------
-CMD ["python", "app.py"]
+CMD ["python", "app/app.py"]

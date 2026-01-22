@@ -7,8 +7,8 @@ pipeline {
 
         // ===== AWS / DEPLOY CONFIG =====
         ECR_REPO = "650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub"
-        EC2_USER = "feed"
-        EC2_HOST = "13.204.79.240"
+        EC2_USER = "ec2-user"
+        EC2_HOST = "43.204.216.35"
         SSH_KEY  = "feedback.pem"
     }
 

@@ -1,0 +1,24 @@
+{% extends "auth/base_auth.html" %}
+{% block content %}
+
+<form method="POST">
+    <label>Username</label><br>
+    <input name="username" required><br><br>
+
+    <label>Password</label><br>
+    <input type="password" name="password" required><br><br>
+
+    <label>Captcha: <strong>{{ captcha }}</strong></label><br>
+    <input name="captcha" required><br><br>
+
+    <button type="submit">Login</button>
+</form>
+
+<p style="color:red">{{ error }}</p>
+
+<p>
+    New user?
+    <a href="/register">Create account</a>
+</p>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumbs %}
+Admin / Feedback
+{% endblock %}
+
+{% block content %}
+<h2>Feedback Records</h2>
+
+<table>
+<tr>
+    <th>User</th>
+    <th>Subject</th>
+    <th>Rating</th>
+    <th>Status</th>
+</tr>
+
+{% for f in feedback %}
+<tr>
+    <td>{{ f.username }}</td>
+    <td>{{ f.subject }}</td>
+    <td>{{ f.rating }}</td>
+    <td>
+        {% if f.completed %}
+        <span class="badge badge-ok">Completed</span>
+        {% else %}
+        <span class="badge badge-pending">Pending</span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

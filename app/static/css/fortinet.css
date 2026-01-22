@@ -1,0 +1,185 @@
+:root {
+    --nav-bg: #1f2933;
+    --nav-bg-hover: #273340;
+    --nav-text: #cfd8e3;
+
+    --bg-main: #f5f7fa;
+    --panel-bg: #ffffff;
+
+    --accent: #0078d4;
+
+    --border: #d0d7de;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+
+    --success: #137333;
+    --warning: #a15c00;
+
+    --anim-fast: 150ms;
+    --anim-med: 220ms;
+}
+
+/* ---------- GLOBAL ---------- */
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* ---------- ADMIN LAYOUT ---------- */
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    background: var(--nav-bg);
+    color: var(--nav-text);
+    display: flex;
+    flex-direction: column;
+    animation: slideIn var(--anim-med) ease-out;
+}
+
+.logo {
+    padding: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--nav-text);
+    transition: background var(--anim-fast), padding var(--anim-fast);
+}
+
+.nav-item:hover {
+    background: var(--nav-bg-hover);
+    padding-left: 26px;
+}
+
+.nav-footer {
+    margin-top: auto;
+    padding: 15px;
+    font-size: 13px;
+}
+
+.nav-footer a {
+    color: var(--nav-text);
+    text-decoration: none;
+}
+
+/* ---------- CONTENT ---------- */
+.content {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+.breadcrumb {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 20px;
+    animation: fadeIn var(--anim-med) ease-in;
+}
+
+/* ---------- TABLES ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: white;
+}
+
+th {
+    text-align: left;
+    background: #eef1f5;
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:hover {
+    background: #f0f4f8;
+}
+
+/* ---------- BADGES ---------- */
+.badge {
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+}
+
+.badge-ok {
+    background: #e6f4ea;
+    color: var(--success);
+}
+
+.badge-pending {
+    background: #fff4e5;
+    color: var(--warning);
+}
+
+/* ---------- AUTH ---------- */
+.auth-bg {
+    height: 100vh;
+    background: #1f2933;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-panel {
+    width: 360px;
+    background: white;
+    padding: 30px;
+    animation: fadeIn var(--anim-med);
+}
+
+/* ---------- USER ---------- */
+.user-header {
+    height: 50px;
+    background: var(--nav-bg);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.user-header a {
+    color: var(--nav-text);
+    text-decoration: none;
+}
+
+.user-content {
+    max-width: 700px;
+    margin: 40px auto;
+    background: white;
+    padding: 25px;
+    border: 1px solid var(--border);
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-8px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}

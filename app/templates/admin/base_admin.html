@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FeedbackHub – Admin</title>
+    <link rel="stylesheet" href="/static/css/fortinet.css">
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="logo">FeedbackHub</div>
+
+        <nav>
+            <a href="/admin" class="nav-item">Dashboard</a>
+            <a href="/admin/users" class="nav-item">Users</a>
+            <a href="/admin/feedback" class="nav-item">Feedback</a>
+            <a href="/admin/logs" class="nav-item">Logs</a>
+        </nav>
+
+        <div class="nav-footer">
+            <a href="/logout">Logout</a>
+        </div>
+    </aside>
+
+    <main class="content">
+        <div class="breadcrumb">
+            {% block breadcrumbs %}{% endblock %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+<script src="/static/js/fortinet.js"></script>
+</body>
+</html>

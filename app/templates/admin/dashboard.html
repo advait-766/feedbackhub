@@ -1,0 +1,41 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumbs %}
+Admin / Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h2>Dashboard</h2>
+
+<div class="panel">
+    <strong>Total Users:</strong> {{ total_users }} <br>
+    <strong>Total Feedback Entries:</strong> {{ total_feedback }}
+</div>
+
+<div class="panel">
+    <h4>Feedback Distribution</h4>
+    <canvas id="feedbackChart" height="120"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('feedbackChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Not Satisfied', 'Satisfied', 'Very Satisfied', 'Perfect'],
+        datasets: [{
+            data: {{ feedbackStats }},
+            backgroundColor: '#0078d4'
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+</script>
+
+{% endblock %}

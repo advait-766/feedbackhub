@@ -1,0 +1,61 @@
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# =====================
+# Flask / App Runtime
+# =====================
+app/database.db
+*.log
+
+# =====================
+# AI / ML Artifacts
+# =====================
+*.joblib
+*.pkl.bak
+.ipynb_checkpoints/
+
+# =====================
+# Security Scan Outputs
+# =====================
+semgrep.json
+trivy.json
+gitleaks.json
+scans/
+
+# =====================
+# Docker
+# =====================
+*.tar
+docker-compose.override.yml
+
+# =====================
+# Jenkins
+# =====================
+workspace/
+builds/
+
+# =====================
+# AWS / Secrets
+# =====================
+*.pem
+*.key
+*.crt
+*.env
+.env.*
+.aws/
+
+# =====================
+# OS / Editor
+# =====================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

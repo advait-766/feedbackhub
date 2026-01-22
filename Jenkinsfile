@@ -2,21 +2,20 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME   = "feedbackhub"
-        AWS_REGION = "ap-south-1"
+        APP_NAME     = "feedbackhub"
+        AWS_REGION  = "ap-south-1"
 
         // ===== AWS / DEPLOY CONFIG =====
-        ECR_REPO = "650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub"
+        ECR_REGISTRY = "650532568136.dkr.ecr.ap-south-1.amazonaws.com"
+        ECR_REPO     = "650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub"
+
         EC2_USER = "ec2-user"
         EC2_HOST = "43.204.216.35"
-        SSH_KEY  = "feedback.pem"
+        SSH_KEY  = "/var/lib/jenkins/.ssh/feedback.pem"
     }
 
     stages {
 
-        /* ============================
-           SOURCE
-        ============================ */
         stage("Checkout Source") {
             steps {
                 git branch: "main",
@@ -24,9 +23,6 @@ pipeline {
             }
         }
 
-        /* ============================
-           SECRETS SCAN
-        ============================ */
         stage("Secrets Scan – Gitleaks") {
             steps {
                 sh '''
@@ -39,9 +35,6 @@ pipeline {
             }
         }
 
-        /* ============================
-           STATIC ANALYSIS
-        ============================ */
         stage("SAST – Semgrep") {
             steps {
                 sh '''
@@ -51,9 +44,6 @@ pipeline {
             }
         }
 
-        /* ============================
-           BUILD
-        ============================ */
         stage("Build Docker Image") {
             steps {
                 sh '''
@@ -63,9 +53,6 @@ pipeline {
             }
         }
 
-        /* ============================
-           CONTAINER SECURITY
-        ============================ */
         stage("Container Scan – Trivy") {
             steps {
                 sh '''
@@ -75,29 +62,25 @@ pipeline {
             }
         }
 
-        /* ============================
-           AI SECURITY GATE
-        ============================ */
         stage("AI Risk Gate") {
             steps {
                 sh '''
                 echo "[AI] Extracting features..."
                 FEATURES=$(/var/lib/jenkins/venvs/ai-env/bin/python ai-risk-engine/extract_features.py)
-		echo "[AI] Features: $FEATURES"
+                echo "[AI] Features: $FEATURES"
+
+                echo "[AI] Evaluating risk..."
                 /var/lib/jenkins/venvs/ai-env/bin/python ai-risk-engine/model_predict.py $FEATURES
                 '''
             }
         }
 
-        /* ============================
-           PUSH TO AWS ECR
-        ============================ */
         stage("Login to AWS ECR") {
             steps {
                 sh '''
                 echo "[AWS] Logging into ECR..."
                 aws ecr get-login-password --region $AWS_REGION \
-                | docker login --username AWS --password-stdin $ECR_REPO
+                | docker login --username AWS --password-stdin $ECR_REGISTRY
                 '''
             }
         }
@@ -112,14 +95,11 @@ pipeline {
             }
         }
 
-        /* ============================
-           DEPLOY TO EC2
-        ============================ */
         stage("Deploy to EC2") {
             steps {
                 sh '''
                 echo "[DEPLOY] Deploying to EC2..."
-                ssh -o StrictHostKeyChecking=no -i $SSH_KEY $EC2_USER@$EC2_HOST "
+                ssh -4 -o StrictHostKeyChecking=no -i $SSH_KEY $EC2_USER@$EC2_HOST "
                     docker pull $ECR_REPO:latest &&
                     docker stop feedbackhub || true &&
                     docker rm feedbackhub || true &&

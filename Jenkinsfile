@@ -82,10 +82,9 @@ pipeline {
             steps {
                 sh '''
                 echo "[AI] Extracting features..."
-                FEATURES=$(python ai-risk-engine/extract_features.py)
-
-                echo "[AI] Features: $FEATURES"
-                python ai-risk-engine/model_predict.py $FEATURES
+                FEATURES=$(/var/lib/jenkins/venvs/ai-env/bin/python ai-risk-engine/extract_features.py)
+		echo "[AI] Features: $FEATURES"
+                /var/lib/jenkins/venvs/ai-env/bin/python ai-risk-engine/model_predict.py $FEATURES
                 '''
             }
         }

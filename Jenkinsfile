@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME     = "feedbackhub"
-        AWS_REGION  = "ap-south-1"
+        APP_NAME      = "feedbackhub"
+        AWS_REGION   = "ap-south-1"
 
         // ===== AWS / DEPLOY CONFIG =====
         ECR_REGISTRY = "650532568136.dkr.ecr.ap-south-1.amazonaws.com"
@@ -77,11 +77,16 @@ pipeline {
 
         stage("Login to AWS ECR") {
             steps {
-                sh '''
-                echo "[AWS] Logging into ECR..."
-                aws ecr get-login-password --region $AWS_REGION \
-                | docker login --username AWS --password-stdin $ECR_REGISTRY
-                '''
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-ecr-creds']
+                ]) {
+                    sh '''
+                    echo "[AWS] Logging into ECR..."
+                    aws ecr get-login-password --region $AWS_REGION \
+                    | docker login --username AWS --password-stdin $ECR_REGISTRY
+                    '''
+                }
             }
         }
 

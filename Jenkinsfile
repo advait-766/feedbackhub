@@ -64,17 +64,27 @@ pipeline {
         }
 
         stage("AI Risk Gate") {
-            steps {
-                sh '''
-                echo "[AI] Extracting features..."
-                FEATURES=$(/home/v2077/Desktop/feedbackhub/app/venv/bin/python ai-risk-engine/extract_features.py)
-                echo "[AI] Features: $FEATURES"
-
-                echo "[AI] Evaluating risk..."
-                /home/v2077/Desktop/feedbackhub/app/venv/bin/python ai-risk-engine/model_predict.py $FEATURES
-                '''
-            }
-        }
+    		steps {
+        		sh '''
+        		cd /home/v2077/Desktop/feedbackhub/app/
+        
+        		# 1. Clean up old results
+        		rm -f trivy.json semgrep.json features.txt
+        
+        		# 2. Scan ONLY the requirements file (not the whole folder)
+        		trivy conf --format json --output trivy.json requirements.txt || true
+        		# OR run fs but skip the venv folder:
+        		trivy fs --skip-dirs venv --format json --output trivy.json .
+        
+        		# 3. Extract and Predict
+        		PYTHON_BIN="/home/v2077/Desktop/feedbackhub/app/venv/bin/python"
+        		FEATURES=$($PYTHON_BIN ai-risk-engine/extract_features.py)
+        		echo "[AI] Features: $FEATURES"
+        	
+        		$PYTHON_BIN ai-risk-engine/model_predict.py $FEATURES
+        		'''
+    		    }
+		}
 
         stage("Login to AWS ECR") {
             steps {

@@ -1,24 +1,40 @@
 {% extends "admin/base_admin.html" %}
-
-{% block breadcrumbs %}
-Admin / Users
-{% endblock %}
-
 {% block content %}
-<h2>Users</h2>
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Identity Management</h1>
+        <p class="text-sm text-slate-500 font-mono">Total Provisioned Accounts: {{ users|length }}</p>
+    </div>
+</div>
 
-<table>
-<tr>
-    <th>Username</th>
-    <th>Role</th>
-    <th>Password Hash</th>
-</tr>
-{% for u in users %}
-<tr>
-    <td>{{ u.username }}</td>
-    <td>{{ u.role }}</td>
-    <td style="font-family: monospace;">{{ u.password_hash }}</td>
-</tr>
-{% endfor %}
-</table>
+<div class="forti-card">
+    <table class="w-full text-left text-sm">
+        <thead class="bg-slate-100 text-slate-600 uppercase text-xs font-bold border-b">
+            <tr>
+                <th class="p-4">UID</th>
+                <th class="p-4">Username</th>
+                <th class="p-4">Security Role</th>
+                <th class="p-4">Provisioned At</th>
+                <th class="p-4">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr class="border-b hover:bg-slate-50 transition">
+                <td class="p-4 font-mono text-slate-400">#{{ user['id'] }}</td>
+                <td class="p-4 font-bold">{{ user['username'] }}</td>
+                <td class="p-4">
+                    <span class="px-2 py-1 rounded text-[10px] font-black {{ 'bg-red-100 text-red-700' if user['role'] == 'admin' else 'bg-blue-100 text-blue-700' }}">
+                        {{ user['role'] | upper }}
+                    </span>
+                </td>
+                <td class="p-4 text-slate-500">{{ user['created_at'] }}</td>
+                <td class="p-4">
+                    <span class="text-green-500 text-xs font-bold">● ACTIVE</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

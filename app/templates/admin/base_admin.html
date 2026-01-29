@@ -1,38 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>FeedbackHub – Admin</title>
-    <link rel="stylesheet" href="/static/css/fortinet.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedbackHub | SecOps Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --forti-navy: #1c2b36; --forti-red: #d32f2f; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .sidebar { background-color: var(--forti-navy); transition: all 0.3s; }
+        .nav-link { border-left: 4px solid transparent; transition: 0.2s; }
+        .nav-link:hover { background: #2a3f4d; border-left-color: var(--forti-red); }
+        .nav-active { background: #2a3f4d; border-left-color: var(--forti-red); }
+        .forti-card { background: white; border-radius: 2px; border-top: 3px solid var(--forti-navy); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden">
 
-<div class="layout">
+    <aside class="sidebar w-64 flex-shrink-0 flex flex-col text-white">
+        <div class="p-5 flex items-center border-b border-gray-700 bg-black/20">
+            <span class="text-2xl mr-2">🛡️</span>
+            <span class="font-bold tracking-wider text-lg">FEEDBACK<span class="text-red-500">HUB</span></span>
+        </div>
+        
+	<nav class="flex-grow py-4">
+    	<div class="px-6 py-2 text-xs uppercase text-gray-500 font-bold">Main Console</div>
+    	<a href="/admin" class="nav-link block px-6 py-3 flex items-center text-sm">
+        	<span class="mr-3">📊</span> Dashboard
+    	</a>
+    
+    	<div class="px-6 py-2 mt-4 text-xs uppercase text-gray-500 font-bold">Security Assets</div>
 
-    <aside class="sidebar">
-        <div class="logo">FeedbackHub</div>
+<a href="/admin/users" class="nav-link block px-6 py-3 flex items-center text-sm">
+    <span class="mr-3">👥</span> Identity Mgmt
+</a>
 
-        <nav>
-            <a href="/admin" class="nav-item">Dashboard</a>
-            <a href="/admin/users" class="nav-item">Users</a>
-            <a href="/admin/feedback" class="nav-item">Feedback</a>
-            <a href="/admin/logs" class="nav-item">Logs</a>
-        </nav>
+<a href="/admin/logins" class="nav-link block px-6 py-3 flex items-center text-sm">
+    <span class="mr-3">🕵️</span> Access SIEM
+</a>
+	</nav>
 
-        <div class="nav-footer">
-            <a href="/logout">Logout</a>
+        <div class="p-4 bg-black/20 border-t border-gray-700">
+            <div class="text-xs text-gray-400 mb-2 font-mono">NODE_STATUS: <span class="text-green-400 animate-pulse">ENCRYPTED</span></div>
+            <a href="/logout" class="text-xs text-red-400 hover:text-red-300">Terminate Session [X]</a>
         </div>
     </aside>
 
-    <main class="content">
-        <div class="breadcrumb">
-            {% block breadcrumbs %}{% endblock %}
+    <main class="flex-grow flex flex-col overflow-y-auto">
+        <header class="bg-white h-14 border-b flex items-center justify-between px-8">
+            <div class="text-sm font-medium text-gray-600 italic">Connected via: SSL-VPN Tunnel</div>
+            <div class="flex items-center space-x-4">
+                <span class="text-xs bg-gray-100 px-2 py-1 rounded">V.2026.02-Stable</span>
+                <span class="text-sm font-bold text-navy-800 uppercase">{{ session.get('role') }}</span>
+            </div>
+        </header>
+        
+        <div class="p-8">
+            {% block content %}{% endblock %}
         </div>
-
-        {% block content %}{% endblock %}
     </main>
 
-</div>
-
-<script src="/static/js/fortinet.js"></script>
 </body>
 </html>

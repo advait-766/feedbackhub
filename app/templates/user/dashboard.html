@@ -1,0 +1,21 @@
+{% extends "user/base_user.html" %} {% block content %}
+<div class="bg-white p-10 border-t-4 border-slate-900 shadow-sm">
+    <h1 class="text-3xl font-bold mb-4 text-slate-800">Student Assessment Portal</h1>
+    <p class="text-slate-600 mb-8 italic font-mono text-sm">AUTHORIZED_SESSION: ACTIVE</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="border p-6 rounded hover:shadow-md transition">
+            <h3 class="font-bold text-xl mb-2">New Assessment</h3>
+            <p class="text-sm text-gray-500 mb-4">Provide feedback for your current C-DAC module.</p>
+            <a href="/select-course" class="inline-block bg-red-600 text-white px-6 py-2 font-bold hover:bg-red-700 uppercase text-xs tracking-widest">
+                Start Feedback
+            </a>
+        </div>
+        
+        <div class="border p-6 rounded bg-slate-50">
+            <h3 class="font-bold text-xl mb-2">Security Notice</h3>
+            <p class="text-xs text-gray-400">Your feedback is submitted via an encrypted channel. All telemetry is logged for audit purposes.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

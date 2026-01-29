@@ -1,0 +1,37 @@
+{% extends "admin/base_admin.html" %}
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">Feedback Repository</h1>
+    <button class="bg-slate-900 text-white px-4 py-2 text-xs font-bold rounded">GENERATE COMPLIANCE REPORT</button>
+</div>
+
+<div class="bg-white border rounded shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-xs">
+            <tr>
+                <th class="p-4 text-left">Student Identity</th>
+                <th class="p-4 text-left">Course / Module</th>
+                <th class="p-4 text-left">Score</th>
+                <th class="p-4 text-left">Comments</th>
+                <th class="p-4 text-left">ISO-8601 Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in feedbacks %}
+            <tr class="border-t hover:bg-slate-50 transition">
+                <td class="p-4 font-medium text-blue-800">{{ f['username'] }}</td>
+                <td class="p-4">
+                    <div class="font-bold">{{ f['course'] }}</div>
+                    <div class="text-xs text-slate-400">{{ f['module_title'] }}</div>
+                </td>
+                <td class="p-4">
+                    <span class="font-black text-lg">{{ f['rating'] }}</span><span class="text-slate-300">/5</span>
+                </td>
+                <td class="p-4 italic text-slate-600">"{{ f['comments'] if f['comments'] else 'No additional commentary provided.' }}"</td>
+                <td class="p-4 text-xs font-mono text-slate-400">{{ f['timestamp'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

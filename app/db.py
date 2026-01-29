@@ -1,51 +1,46 @@
 import sqlite3
+from pathlib import Path
 
-DB_NAME = "feedback.db"
+DB_PATH = Path("feedbackhub.db")
 
 def get_db():
-    return sqlite3.connect(DB_NAME)
+    return sqlite3.connect(DB_PATH)
 
 def init_db():
-    print("[DB] Recreating database schema...")
-
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("DROP TABLE IF EXISTS users")
-    cur.execute("DROP TABLE IF EXISTS feedback")
-    cur.execute("DROP TABLE IF EXISTS login_logs")
-
     cur.execute("""
-    CREATE TABLE users (
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password_hash TEXT,
-        role TEXT,
-        is_initialized INTEGER DEFAULT 0
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
     cur.execute("""
-    CREATE TABLE feedback (
+    CREATE TABLE IF NOT EXISTS login_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
-        subject TEXT,
-        rating TEXT,
-        comments TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
     cur.execute("""
-    CREATE TABLE login_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        login_time DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    CREATE TABLE IF NOT EXISTS feedback (
+	    id INTEGER PRIMARY KEY AUTOINCREMENT,
+	    user_id INTEGER,
+	    course TEXT,
+	    module_code TEXT,
+	    module_title TEXT,
+	    rating TEXT,
+	    comments TEXT,
+	    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+     )
+     """)
+
 
     conn.commit()
     conn.close()
-
-    print("[DB] Schema recreated successfully")
-

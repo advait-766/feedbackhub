@@ -1,24 +1,56 @@
-{% extends "auth/base_auth.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FeedbackHub | Secure Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(135deg, #0f172a 0%, #1c2b36 100%); }
+        .login-box { border-top: 4px solid #d32f2f; background: rgba(255, 255, 255, 0.98); }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center">
+    <div class="login-box w-full max-w-md p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold tracking-tighter text-slate-800">FEEDBACK<span class="text-red-600">HUB</span></h1>
+            <p class="text-xs font-mono text-slate-500 uppercase">Secure Access Gateway v2026.02</p>
+        </div>
 
-<form method="POST">
-    <label>Username</label><br>
-    <input name="username" required><br><br>
+        {% if error %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 text-xs font-bold">
+            CRITICAL_AUTH_FAILURE: {{ error }}
+        </div>
+        {% endif %}
 
-    <label>Password</label><br>
-    <input type="password" name="password" required><br><br>
+        <form method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Identity ID</label>
+                <input type="text" name="username" required class="w-full border-b-2 border-slate-300 focus:border-red-600 outline-none p-2 transition text-sm">
+            </div>
 
-    <label>Captcha: <strong>{{ captcha }}</strong></label><br>
-    <input name="captcha" required><br><br>
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Access Token (Password)</label>
+                <input type="password" name="password" required class="w-full border-b-2 border-slate-300 focus:border-red-600 outline-none p-2 transition text-sm">
+            </div>
 
-    <button type="submit">Login</button>
-</form>
+            <div class="bg-slate-100 p-4 border rounded">
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Human Verification (CAPTCHA)</label>
+                <div class="flex items-center space-x-4">
+                    <span id="captcha-code" class="bg-black text-white px-4 py-2 font-mono tracking-widest italic select-none">{{ captcha }}</span>
+                    <input type="text" name="captcha" required placeholder="Type Code" class="flex-grow border p-2 text-sm uppercase">
+                </div>
+            </div>
 
-<p style="color:red">{{ error }}</p>
+            <button type="submit" class="w-full bg-slate-900 text-white font-bold py-3 hover:bg-red-700 transition shadow-lg uppercase text-sm">
+                Initiate Session
+            </button>
+        </form>
 
-<p>
-    New user?
-    <a href="/register">Create account</a>
-</p>
-
-{% endblock %}
+        <div class="mt-6 text-center">
+            <a href="/register" class="text-xs text-slate-500 hover:text-red-600 underline">Register New Identity</a>
+        </div>
+    </div>
+</body>
+</html>

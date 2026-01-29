@@ -105,7 +105,7 @@ pipeline {
                 sh '''
                 echo "[DEPLOY] Deploying to EC2..."
                 ssh -4 -o StrictHostKeyChecking=no -i $SSH_KEY $EC2_USER@$EC2_HOST "
-                    docker pull $ECR_REPO:latest &&
+                    docker $ECR_REPO:latest &&
                     docker stop feedbackhub || true &&
                     docker rm feedbackhub || true &&
                     docker run -d \

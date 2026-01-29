@@ -1,0 +1,39 @@
+{% extends "user/base_user.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="bg-slate-900 p-6 text-white">
+            <h2 class="text-xl font-bold uppercase tracking-tight">Module Assessment</h2>
+            <p class="text-slate-400 text-xs">{{ module.title }} ({{ course.title }})</p>
+        </div>
+
+        <form method="POST" class="p-8 space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            {% for metric in metrics %}
+            <div class="border-b pb-4">
+                <label class="block font-semibold text-slate-700 mb-3 text-sm">{{ metric }}</label>
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded">
+                    {% for i in range(1, 6) %}
+                    <label class="flex flex-col items-center cursor-pointer group">
+                        <input type="radio" name="metric_{{ metric }}" value="{{ i }}" class="peer hidden" required>
+                        <span class="w-10 h-10 flex items-center justify-center border-2 rounded-full peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 transition font-bold text-slate-400">{{ i }}</span>
+                        <span class="text-[10px] mt-1 text-slate-400 peer-checked:text-blue-600 font-bold uppercase">Lvl {{ i }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div>
+                <label class="block font-bold text-slate-700 text-sm mb-2 uppercase">Subjective Improvements / Comments</label>
+                <textarea name="comments" rows="4" class="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="How can we improve the laboratory sessions or theory delivery?"></textarea>
+            </div>
+
+            <input type="hidden" name="rating" value="5"> <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-lg hover:bg-blue-600 transition transform active:scale-95 shadow-lg">
+                SUBMIT ASSESSMENT TO C-DAC HQ
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

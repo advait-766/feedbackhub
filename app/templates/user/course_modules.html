@@ -1,0 +1,24 @@
+{% extends "user/base_user.html" %}
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">{{ course.title }}</h1>
+    <p class="text-slate-500">Select a specific module to provide feedback.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for module in course.modules %}
+    <div class="bg-white p-6 border rounded-lg shadow-sm hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3 class="font-bold text-lg text-slate-800">{{ module.title }}</h3>
+                <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded">CODE: {{ module.code }}</span>
+            </div>
+            <a href="/feedback/{{ course_id }}/{{ module.code }}" 
+               class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-blue-700">
+               PROVIDE FEEDBACK
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

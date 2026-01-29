@@ -1,23 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>FeedbackHub – User</title>
-    <link rel="stylesheet" href="/static/css/fortinet.css">
+    <meta charset="UTF-8">
+    <title>C-DAC Student Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --cdac-navy: #0f172a; --cdac-gold: #fbbf24; }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .user-sidebar { background-color: var(--cdac-navy); }
+        .nav-item:hover { background-color: rgba(255,255,255,0.05); border-left: 4px solid var(--cdac-gold); }
+    </style>
 </head>
-<body>
-
-<div class="user-layout">
-    <header class="user-header">
-        <div class="user-logo">FeedbackHub</div>
-        <div class="user-actions">
-            <a href="/logout">Logout</a>
+<body class="flex h-screen overflow-hidden">
+    <aside class="user-sidebar w-64 flex-shrink-0 text-white flex flex-col">
+        <div class="p-6 border-b border-slate-700 flex items-center">
+            <span class="text-xl mr-2">🎓</span> <span class="font-bold tracking-tight">STUDENT<span class="text-yellow-500">PORTAL</span></span>
         </div>
-    </header>
-
-    <main class="user-content">
-        {% block content %}{% endblock %}
+        <nav class="flex-grow py-4">
+            <a href="/dashboard" class="nav-item block px-6 py-3 text-sm">Dashboard</a>
+            <a href="/select-course" class="nav-item block px-6 py-3 text-sm">My Courses</a>
+        </nav>
+        <div class="p-4 border-t border-slate-700">
+            <a href="/logout" class="text-xs text-slate-400 hover:text-white uppercase font-bold">Logout Session</a>
+        </div>
+    </aside>
+    <main class="flex-grow flex flex-col overflow-y-auto">
+        <header class="h-14 bg-white border-b flex items-center px-8 justify-between text-sm text-slate-500">
+            <div>Session Status: <span class="text-green-600 font-bold">Active</span></div>
+            <div class="font-bold text-slate-800">C-DAC ACADEMIC FEEDBACK 2026</div>
+        </header>
+        <div class="p-8">{% block content %}{% endblock %}</div>
     </main>
-</div>
-
 </body>
 </html>

@@ -1,5 +1,6 @@
 import random
 import string
 
-def generate_captcha():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+def generate_captcha(length=5):
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=length))

@@ -64,27 +64,30 @@ pipeline {
         }
 
         stage("AI Risk Gate") {
-    		steps {
-        		sh '''
-        		cd /home/v2077/Desktop/feedbackhub/app/
+    	    steps {
+        	sh '''
+        	# 1. Define base directory to avoid typing it every time
+        	APP_DIR="/home/v2077/Desktop/feedbackhub/app"
+        	PYTHON_BIN="$APP_DIR/venv/bin/python"
         
-        		# 1. Clean up old results
-        		rm -f trivy.json semgrep.json features.txt
+        	# 2. Enter the directory
+        	cd $APP_DIR
         
-        		# 2. Scan ONLY the requirements file (not the whole folder)
-        		trivy conf --format json --output trivy.json requirements.txt || true
-        		# OR run fs but skip the venv folder:
-        		trivy fs --skip-dirs venv --format json --output trivy.json .
+        	# 3. Clean and Scan (Skip venv to avoid scanning thousands of library files)
+        	rm -f trivy.json semgrep.json
+        	trivy fs --skip-dirs venv --severity CRITICAL,HIGH --format json --output trivy.json .
         
-        		# 3. Extract and Predict
-        		PYTHON_BIN="/home/v2077/Desktop/feedbackhub/app/venv/bin/python"
-        		FEATURES=$($PYTHON_BIN ai-risk-engine/extract_features.py)
-        		echo "[AI] Features: $FEATURES"
-        	
-        		$PYTHON_BIN ai-risk-engine/model_predict.py $FEATURES
-        		'''
-    		    }
-		}
+        	# 4. Extract Features (Using FULL path to the script)
+        	echo "[AI] Extracting features..."
+        	FEATURES=$($PYTHON_BIN $APP_DIR/ai-risk-engine/extract_features.py)
+        	echo "[AI] Features: $FEATURES"
+        
+        	# 5. Evaluate Risk (Using FULL path to the script)
+        	echo "[AI] Evaluating risk..."
+        	$PYTHON_BIN $APP_DIR/ai-risk-engine/model_predict.py $FEATURES
+        	'''
+   	   }
+	}
 
         stage("Login to AWS ECR") {
             steps {

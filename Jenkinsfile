@@ -115,22 +115,14 @@ pipeline {
         }
 
         stage("Deploy to EC2") {
-            steps {
-                sh '''
-                echo "[DEPLOY] Deploying to EC2..."
-                ssh -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@3.110.85.212"
-    		# Authenticate with ECR (Make sure this line is there!)
-    		aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 650532568136.dkr.ecr.ap-south-1.amazonaws.com &&
-    		# Pull the NEW image specifically
-    		docker pull 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest &&
-    		docker stop feedbackhub || true &&
-    		docker rm feedbackhub || true &&
-    		docker run -d --name feedbackhub -p 80:5000 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest
-                "
-                '''
-            }
-        }
-    }
+    		steps {
+        	    sh '''
+        		echo "[DEPLOY] Deploying to EC2..."
+        		# All on one line to prevent "invalid character" errors
+        		ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@3.110.85.212 "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 650532568136.dkr.ecr.ap-south-1.amazonaws.com && docker pull 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest && docker stop feedbackhub || true && docker rm feedbackhub || true && docker run -d --name feedbackhub -p 80:5000 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest"
+        	'''
+    		}
+	}
 
     post {
         success {

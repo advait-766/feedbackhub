@@ -14,5 +14,5 @@ MarkupSafe==3.0.3
 python-dotenv==1.0.1
 requests==2.31.0
 urllib3==2.6.3
-Werkzeug==3.0.1
+Werkzeug==3.0.3
 WTForms==3.2.1

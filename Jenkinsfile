@@ -128,7 +128,7 @@ pipeline {
         	'''
     		}
 	}
-
+}
     post {
         success {
             echo "✅ Pipeline completed successfully — AI approved deployment."

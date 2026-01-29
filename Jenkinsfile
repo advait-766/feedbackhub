@@ -39,7 +39,8 @@ pipeline {
             steps {
                 sh '''
                 echo "[SEMGREP] Running static analysis..."
-                semgrep --config auto --json > semgrep.json || true
+                # 1. Run Semgrep using the absolute path to the binary in your venv
+		/home/v2077/Desktop/feedbackhub/app/venv/bin/semgrep --config auto --json --output semgrep.json || true
                 '''
             }
         }

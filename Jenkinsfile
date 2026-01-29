@@ -67,7 +67,7 @@ pipeline {
     	    steps {
         	sh '''
         	# 1. Define base directory to avoid typing it every time
-        	APP_DIR="/home/v2077/Desktop/feedbackhub/app"
+        	APP_DIR="/home/v2077/Desktop/feedbackhub"
         	PYTHON_BIN="$APP_DIR/venv/bin/python"
         
         	# 2. Enter the directory

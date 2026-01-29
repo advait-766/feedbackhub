@@ -118,14 +118,14 @@ pipeline {
             steps {
                 sh '''
                 echo "[DEPLOY] Deploying to EC2..."
-                ssh -4 -o StrictHostKeyChecking=no -i $SSH_KEY $EC2_USER@$EC2_HOST "
-                    docker $ECR_REPO:latest &&
-                    docker stop feedbackhub || true &&
-                    docker rm feedbackhub || true &&
-                    docker run -d \
-                      --name feedbackhub \
-                      -p 80:5000 \
-                      $ECR_REPO:latest
+                ssh -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@15.206.92.133 "
+    		# Authenticate with ECR (Make sure this line is there!)
+    		aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 650532568136.dkr.ecr.ap-south-1.amazonaws.com &&
+    		# Pull the NEW image specifically
+    		docker pull 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest &&
+    		docker stop feedbackhub || true &&
+    		docker rm feedbackhub || true &&
+    		docker run -d --name feedbackhub -p 80:5000 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest
                 "
                 '''
             }

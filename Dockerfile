@@ -13,33 +13,15 @@ ENV PYTHONUNBUFFERED=1
 # ----------------------------------------
 # Working directory
 # ----------------------------------------
+# ... (Base image and deps stay the same)
+
 WORKDIR /app
 
-# ----------------------------------------
-# System dependencies (build only)
-# ----------------------------------------
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# ----------------------------------------
-# Python dependencies (cached layer)
-# ----------------------------------------
 COPY app/requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# ----------------------------------------
-# Application source (changes most often)
-# ----------------------------------------
-COPY app/ ./app
+COPY app/ .
 
-# ----------------------------------------
-# Expose Flask port
-# ----------------------------------------
 EXPOSE 5000
 
-# ----------------------------------------
-# Start application
-# ----------------------------------------
-CMD ["python", "app/app.py"]
+CMD ["python", "app.py"]

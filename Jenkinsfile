@@ -10,7 +10,7 @@ pipeline {
         ECR_REPO     = "650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub"
 
         EC2_USER = "ec2-user"
-        EC2_HOST = "13.233.186.62"
+        EC2_HOST = "3.110.85.212"
         SSH_KEY  = "/var/lib/jenkins/.ssh/feedback.pem"
     }
 

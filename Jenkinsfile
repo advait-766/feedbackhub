@@ -118,7 +118,7 @@ pipeline {
             steps {
                 sh '''
                 echo "[DEPLOY] Deploying to EC2..."
-                ssh -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@15.206.92.133 "
+                ssh -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@$EC2_HOST"
     		# Authenticate with ECR (Make sure this line is there!)
     		aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 650532568136.dkr.ecr.ap-south-1.amazonaws.com &&
     		# Pull the NEW image specifically

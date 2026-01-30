@@ -58,23 +58,22 @@ def module_feedback(course_id, module_code):
                            module=module, 
                            metrics=FEEDBACK_METRICS)
 # --- DEVSECOPS SECURITY LAYERS ---
-csrf = CSRFProtect(app)
-# Content Security Policy (Fortinet-like strictness)
 csp = {
     'default-src': '\'self\'',
-    'script-src': [
-        '\'self\'',
-        'https://cdn.jsdelivr.net', # For Chart.js
-        'https://cdn.tailwindcss.com'
-    ],
     'style-src': [
         '\'self\'',
-        'https://cdn.tailwindcss.com',
-        '\'unsafe-inline\'' # For Tailwind dynamic colors
+        'https://stackpath.bootstrapcdn.com', # If using Bootstrap CDN
+        'https://fonts.googleapis.com',
+        '\'unsafe-inline\''                    # Allows inline styles
+    ],
+    'script-src': [
+        '\'self\'',
+        'https://code.jquery.com',
+        '\'unsafe-inline\''                    # Allows inline scripts
     ]
 }
 # Change your Talisman line to this:
-Talisman(app, force_https=False)
+Talisman(app, force_https=False, content_security_policy=csp)
 
 # -------------------- DATABASE INIT --------------------
 def get_db():

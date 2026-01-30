@@ -7,6 +7,13 @@ import sqlite3
 import csv
 import io
 from flask import Response
+from flask import Flask, render_template, request, redirect, session, jsonify, url_for, Response
+from flask_talisman import Talisman
+from flask_wtf.csrf import CSRFProtect
+from prometheus_flask_exporter import PrometheusMetrics
+from werkzeug.security import generate_password_hash
+import json
+# ... rest of your imports
 # Local imports
 from models import authenticate, create_user
 from captcha import generate_captcha
@@ -14,7 +21,7 @@ from courses import COURSES, FEEDBACK_METRICS
 
 DB_NAME = "feedbackhub.db"
 app = Flask(__name__)
-app.secret_key = "fortinet-style-secure-key-2026" # Use ENV variable in prod
+app.secret_key = "fortinet-style-secure-key-2026"
 
 metrics = PrometheusMetrics(app, group_by='endpoint')
 metrics.info('app_info', 'FeedbackHub DevSecOps Portal', version='1.0.0')
@@ -35,8 +42,6 @@ csp = {
     ]
 }
 Talisman(app, content_security_policy=csp)
-
-# ... (Keep all your existing get_db(), init_db(), and login() functions here) ...
 
 # =====================================================
 # CDAC FEEDBACK FLOW (WITH MONITORING)

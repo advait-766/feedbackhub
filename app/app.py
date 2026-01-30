@@ -26,8 +26,6 @@ app.config.update(
 # =====================================================
 
 @app.route("/feedback/<course_id>/<module_code>", methods=["GET", "POST"])
-# This custom metric will show up in Grafana as a "Feedback Counter"
-@metrics.counter('feedback_submissions_total', 'Total feedback forms submitted')
 def module_feedback(course_id, module_code):
     if "user_id" not in session:
         return redirect("/")

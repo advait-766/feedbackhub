@@ -114,27 +114,37 @@ pipeline {
             }
         }
 
-	stage("Deploy to EC2") {
-    		steps {
-        	   sh '''
-        		echo '[DEPLOY] Deploying to EC2...'
-       			ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@3.111.198.152\
-        		"aws ecr get-login-password --region ap-south-1 | \
-        		docker login --username AWS --password-stdin 650532568136.dkr.ecr.ap-south-1.amazonaws.com && \
-        		docker pull 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest && \
-        		docker stop feedbackhub || true && \
-        		docker rm feedbackhub || true && \
-        		docker run -d --name feedbackhub -p 80:5000 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest"
-        	'''
-    		}
-	}
-}
+	stage("Deploy & Monitor") {
+            steps {
+                sh '''
+                echo "[DEPLOY] Deploying App and Monitoring Stack..."
+                ssh -o StrictHostKeyChecking=no -i $SSH_KEY $EC2_USER@$EC2_HOST "
+                    # 1. Update and Run the FeedbackHub App
+                    aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin $ECR_REGISTRY && \
+                    docker pull $ECR_REPO:latest && \
+                    docker stop feedbackhub || true && docker rm feedbackhub || true && \
+                    docker run -d --name feedbackhub -p 80:5000 $ECR_REPO:latest && \
+
+                    # 2. Launch Prometheus & Grafana
+                    if [ -d '$MONITOR_DIR' ]; then
+                        cd $MONITOR_DIR && \
+                        docker-compose up -d
+                        echo 'Monitoring stack updated.'
+                    else
+                        echo 'Monitoring directory not found. Please create ~/monitoring/docker-compose.yml manually once.'
+                    fi
+                "
+                '''
+            }
+        }
+    }
+
     post {
         success {
-            echo "✅ Pipeline completed successfully — AI approved deployment."
+            echo "Pipeline Success: App is live (deployment successfully approved by AI) and Grafana is monitoring traffic."
         }
         failure {
-            echo "❌ Pipeline stopped — security risk detected or deployment failed."
+            echo "Pipeline Failure: Check logs for Security or Deployment errors (AI disapproved the deployment due to security reasons)"
         }
     }
 }

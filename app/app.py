@@ -7,14 +7,8 @@ import sqlite3
 import csv
 import io
 from flask import Response
-from flask import Flask, render_template, request, redirect, session, jsonify, url_for, Response
-from flask_talisman import Talisman
-from flask_wtf.csrf import CSRFProtect
 from prometheus_flask_exporter import PrometheusMetrics
-from werkzeug.security import generate_password_hash
 import json
-# ... rest of your imports
-# Local imports
 from models import authenticate, create_user
 from captcha import generate_captcha
 from courses import COURSES, FEEDBACK_METRICS
@@ -25,23 +19,6 @@ app.secret_key = "fortinet-style-secure-key-2026"
 
 metrics = PrometheusMetrics(app, group_by='endpoint')
 metrics.info('app_info', 'FeedbackHub DevSecOps Portal', version='1.0.0')
-
-# --- DEVSECOPS SECURITY LAYERS ---
-csrf = CSRFProtect(app)
-csp = {
-    'default-src': '\'self\'',
-    'script-src': [
-        '\'self\'',
-        'https://cdn.jsdelivr.net',
-        'https://cdn.tailwindcss.com'
-    ],
-    'style-src': [
-        '\'self\'',
-        'https://cdn.tailwindcss.com',
-        '\'unsafe-inline\''
-    ]
-}
-Talisman(app, content_security_policy=csp)
 
 # =====================================================
 # CDAC FEEDBACK FLOW (WITH MONITORING)
@@ -223,43 +200,6 @@ def course_modules(course_id):
     return render_template("user/course_modules.html", 
                            course_id=course_id, 
                            course=course)
-
-# --- FEEDBACK FORM SUBMISSION ---
-@app.route("/feedback/<course_id>/<module_code>", methods=["GET", "POST"])
-def module_feedback(course_id, module_code):
-    if "user_id" not in session:
-        return redirect("/")
-
-    course = COURSES.get(course_id)
-    module = next((m for m in course["modules"] if m["code"] == module_code), None)
-
-    if request.method == "POST":
-        import json
-        # Capture granular CDAC metrics
-        metrics_data = {m: request.form.get(f"metric_{m}") for m in FEEDBACK_METRICS}
-        
-        conn = get_db()
-        conn.execute("""
-            INSERT INTO feedback (user_id, course, module_code, module_title, rating, metrics_json, comments)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (
-            session["user_id"], 
-            course_id, 
-            module_code, 
-            module["title"], 
-            request.form.get("rating", 5), 
-            json.dumps(metrics_data), 
-            request.form.get("comments", "")
-        ))
-        conn.commit()
-        conn.close()
-        # Redirect back to module list after successful submission
-        return redirect(url_for('course_modules', course_id=course_id))
-
-    return render_template("user/module_feedback.html", 
-                           course=course, 
-                           module=module, 
-                           metrics=FEEDBACK_METRICS)
 
 # =====================================================
 # ADMIN (SEC-OPS PORTAL)

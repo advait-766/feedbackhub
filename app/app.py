@@ -72,7 +72,8 @@ csp = {
         '\'unsafe-inline\'' # For Tailwind dynamic colors
     ]
 }
-Talisman(app, content_security_policy=csp)
+# Change your Talisman line to this:
+Talisman(app, content_security_policy=csp, force_https=False)
 
 # -------------------- DATABASE INIT --------------------
 def get_db():

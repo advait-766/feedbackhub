@@ -12,6 +12,7 @@ pipeline {
         EC2_USER = "ec2-user"
         EC2_HOST = "3.111.198.152"
         SSH_KEY  = "/var/lib/jenkins/.ssh/feedback.pem"
+        MONITOR_DIR = "/home/ec2-user/monitoring"
     }
 
     stages {

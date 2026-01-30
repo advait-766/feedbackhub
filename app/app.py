@@ -16,6 +16,66 @@ DB_NAME = "feedbackhub.db"
 app = Flask(__name__)
 app.secret_key = "fortinet-style-secure-key-2026" # Use ENV variable in prod
 
+metrics = PrometheusMetrics(app, group_by='endpoint')
+metrics.info('app_info', 'FeedbackHub DevSecOps Portal', version='1.0.0')
+
+# --- DEVSECOPS SECURITY LAYERS ---
+csrf = CSRFProtect(app)
+csp = {
+    'default-src': '\'self\'',
+    'script-src': [
+        '\'self\'',
+        'https://cdn.jsdelivr.net',
+        'https://cdn.tailwindcss.com'
+    ],
+    'style-src': [
+        '\'self\'',
+        'https://cdn.tailwindcss.com',
+        '\'unsafe-inline\''
+    ]
+}
+Talisman(app, content_security_policy=csp)
+
+# ... (Keep all your existing get_db(), init_db(), and login() functions here) ...
+
+# =====================================================
+# CDAC FEEDBACK FLOW (WITH MONITORING)
+# =====================================================
+
+@app.route("/feedback/<course_id>/<module_code>", methods=["GET", "POST"])
+# This custom metric will show up in Grafana as a "Feedback Counter"
+@metrics.counter('feedback_submissions_total', 'Total feedback forms submitted')
+def module_feedback(course_id, module_code):
+    if "user_id" not in session:
+        return redirect("/")
+
+    course = COURSES.get(course_id)
+    module = next((m for m in course["modules"] if m["code"] == module_code), None)
+
+    if request.method == "POST":
+        metrics_data = {m: request.form.get(f"metric_{m}") for m in FEEDBACK_METRICS}
+        
+        conn = get_db()
+        conn.execute("""
+            INSERT INTO feedback (user_id, course, module_code, module_title, rating, metrics_json, comments)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            session["user_id"], 
+            course_id, 
+            module_code, 
+            module["title"], 
+            request.form.get("rating", 5), 
+            json.dumps(metrics_data), 
+            request.form.get("comments", "")
+        ))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('course_modules', course_id=course_id))
+
+    return render_template("user/module_feedback.html", 
+                           course=course, 
+                           module=module, 
+                           metrics=FEEDBACK_METRICS)
 # --- DEVSECOPS SECURITY LAYERS ---
 csrf = CSRFProtect(app)
 # Content Security Policy (Fortinet-like strictness)

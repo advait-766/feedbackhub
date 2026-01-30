@@ -353,7 +353,8 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
+    metrics.register_endpoint('/metrics')
     metrics.info('app_info', 'FeedbackHub', version='1.0.0')
-    csrf = CSRFProtect(app)
     csrf.exempt("/metrics")
+    print("Security layers active. Monitoring endpoint registered at /metrics.")
     app.run(host="0.0.0.0", port=5000)

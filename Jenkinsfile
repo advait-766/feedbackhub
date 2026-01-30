@@ -125,7 +125,8 @@ pipeline {
                     docker pull $ECR_REPO:latest && \
                     docker stop feedbackhub || true && docker rm feedbackhub || true && \
                     docker run -d --name feedbackhub -p 80:5000 $ECR_REPO:latest && \
-
+		    # In your Jenkinsfile deploy script, right after 'docker run'
+		    docker network connect monitoring_default feedbackhub || true
                     # 2. Launch Prometheus & Grafana
                     if [ -d '$MONITOR_DIR' ]; then
                         cd $MONITOR_DIR && \

@@ -18,7 +18,6 @@ app = Flask(__name__)
 app.secret_key = "fortinet-style-secure-key-2026"
 
 metrics = PrometheusMetrics(app)
-metrics.register_endpoint('/metrics')
 # =====================================================
 # CDAC FEEDBACK FLOW (WITH MONITORING)
 # =====================================================

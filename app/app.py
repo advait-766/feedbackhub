@@ -16,6 +16,9 @@ from courses import COURSES, FEEDBACK_METRICS
 DB_NAME = "feedbackhub.db"
 app = Flask(__name__)
 app.secret_key = "fortinet-style-secure-key-2026"
+
+metrics = PrometheusMetrics(app)
+metrics.register_endpoint('/metrics')
 # =====================================================
 # CDAC FEEDBACK FLOW (WITH MONITORING)
 # =====================================================
@@ -350,9 +353,7 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    metrics = PrometheusMetrics(app)
-    metrics.register_endpoint('/metrics')
     metrics.info('app_info', 'FeedbackHub', version='1.0.0')
     csrf = CSRFProtect(app)
     csrf.exempt("/metrics")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)

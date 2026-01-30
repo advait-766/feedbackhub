@@ -7,73 +7,32 @@ import sqlite3
 import csv
 import io
 from flask import Response
-import json
+# Local imports
 from models import authenticate, create_user
 from captcha import generate_captcha
 from courses import COURSES, FEEDBACK_METRICS
 
 DB_NAME = "feedbackhub.db"
 app = Flask(__name__)
-app.secret_key = "fortinet-style-secure-key-2026"
-csrf = CSRFProtect(app)
-app.config.update(
-    SESSION_COOKIE_SECURE=False,   # Required for HTTP (non-SSL) EC2 access
-    SESSION_COOKIE_HTTPONLY=True,  # Prevents JavaScript from stealing cookies
-    SESSION_COOKIE_SAMESITE='Lax', # Protects against CSRF while allowing navigation
-)
-# =====================================================
-# CDAC FEEDBACK FLOW (WITH MONITORING)
-# =====================================================
+app.secret_key = "fortinet-style-secure-key-2026" # Use ENV variable in prod
 
-@app.route("/feedback/<course_id>/<module_code>", methods=["GET", "POST"])
-def module_feedback(course_id, module_code):
-    if "user_id" not in session:
-        return redirect("/")
-
-    course = COURSES.get(course_id)
-    module = next((m for m in course["modules"] if m["code"] == module_code), None)
-
-    if request.method == "POST":
-        metrics_data = {m: request.form.get(f"metric_{m}") for m in FEEDBACK_METRICS}
-        
-        conn = get_db()
-        conn.execute("""
-            INSERT INTO feedback (user_id, course, module_code, module_title, rating, metrics_json, comments)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (
-            session["user_id"], 
-            course_id, 
-            module_code, 
-            module["title"], 
-            request.form.get("rating", 5), 
-            json.dumps(metrics_data), 
-            request.form.get("comments", "")
-        ))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('course_modules', course_id=course_id))
-
-    return render_template("user/module_feedback.html", 
-                           course=course, 
-                           module=module, 
-                           metrics=FEEDBACK_METRICS)
 # --- DEVSECOPS SECURITY LAYERS ---
+csrf = CSRFProtect(app)
+# Content Security Policy (Fortinet-like strictness)
 csp = {
     'default-src': '\'self\'',
-    'style-src': [
-        '\'self\'',
-        'https://stackpath.bootstrapcdn.com', # If using Bootstrap CDN
-        'https://fonts.googleapis.com',
-        '\'unsafe-inline\''                    # Allows inline styles
-    ],
     'script-src': [
         '\'self\'',
-        'https://code.jquery.com',
-        '\'unsafe-inline\''                    # Allows inline scripts
+        'https://cdn.jsdelivr.net', # For Chart.js
+        'https://cdn.tailwindcss.com'
+    ],
+    'style-src': [
+        '\'self\'',
+        'https://cdn.tailwindcss.com',
+        '\'unsafe-inline\'' # For Tailwind dynamic colors
     ]
 }
-# Change your Talisman line to this:
-Talisman(app, force_https=False, content_security_policy=csp)
+Talisman(app, content_security_policy=csp)
 
 # -------------------- DATABASE INIT --------------------
 def get_db():
@@ -199,6 +158,43 @@ def course_modules(course_id):
     return render_template("user/course_modules.html", 
                            course_id=course_id, 
                            course=course)
+
+# --- FEEDBACK FORM SUBMISSION ---
+@app.route("/feedback/<course_id>/<module_code>", methods=["GET", "POST"])
+def module_feedback(course_id, module_code):
+    if "user_id" not in session:
+        return redirect("/")
+
+    course = COURSES.get(course_id)
+    module = next((m for m in course["modules"] if m["code"] == module_code), None)
+
+    if request.method == "POST":
+        import json
+        # Capture granular CDAC metrics
+        metrics_data = {m: request.form.get(f"metric_{m}") for m in FEEDBACK_METRICS}
+        
+        conn = get_db()
+        conn.execute("""
+            INSERT INTO feedback (user_id, course, module_code, module_title, rating, metrics_json, comments)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            session["user_id"], 
+            course_id, 
+            module_code, 
+            module["title"], 
+            request.form.get("rating", 5), 
+            json.dumps(metrics_data), 
+            request.form.get("comments", "")
+        ))
+        conn.commit()
+        conn.close()
+        # Redirect back to module list after successful submission
+        return redirect(url_for('course_modules', course_id=course_id))
+
+    return render_template("user/module_feedback.html", 
+                           course=course, 
+                           module=module, 
+                           metrics=FEEDBACK_METRICS)
 
 # =====================================================
 # ADMIN (SEC-OPS PORTAL)
@@ -353,5 +349,4 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
-
+    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -7,7 +7,6 @@ import sqlite3
 import csv
 import io
 from flask import Response
-from prometheus_flask_exporter import PrometheusMetrics
 import json
 from models import authenticate, create_user
 from captcha import generate_captcha
@@ -16,8 +15,12 @@ from courses import COURSES, FEEDBACK_METRICS
 DB_NAME = "feedbackhub.db"
 app = Flask(__name__)
 app.secret_key = "fortinet-style-secure-key-2026"
-
-metrics = PrometheusMetrics(app)
+csrf = CSRFProtect(app)
+app.config.update(
+    SESSION_COOKIE_SECURE=False,   # Required for HTTP (non-SSL) EC2 access
+    SESSION_COOKIE_HTTPONLY=True,  # Prevents JavaScript from stealing cookies
+    SESSION_COOKIE_SAMESITE='Lax', # Protects against CSRF while allowing navigation
+)
 # =====================================================
 # CDAC FEEDBACK FLOW (WITH MONITORING)
 # =====================================================
@@ -73,7 +76,7 @@ csp = {
     ]
 }
 # Change your Talisman line to this:
-Talisman(app, content_security_policy=csp, force_https=False)
+Talisman(app, force_https=False)
 
 # -------------------- DATABASE INIT --------------------
 def get_db():
@@ -353,7 +356,5 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    metrics.info('app_info', 'FeedbackHub', version='1.0.0')
-    csrf.exempt("/metrics")
-    print("Security layers active. Monitoring endpoint registered at /metrics.")
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000)
+

@@ -355,3 +355,8 @@ def logout():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+    metrics = PrometheusMetrics(app)
+    metrics.register_endpoint('/metrics')
+    metrics.info('app_info', 'FeedbackHub', version='1.0.0')
+    csrf = CSRFProtect(app)
+    csrf.exempt("/metrics")

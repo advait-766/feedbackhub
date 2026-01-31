@@ -10,7 +10,7 @@ pipeline {
         ECR_REPO     = "650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub"
 
         EC2_USER = "ec2-user"
-        EC2_HOST = "3.111.198.152"
+        EC2_HOST = "13.201.34.51"
         SSH_KEY  = "/var/lib/jenkins/.ssh/feedback.pem"
     }
 
@@ -118,7 +118,7 @@ pipeline {
     		steps {
         	   sh '''
         		echo '[DEPLOY] Deploying to EC2...'
-       			ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@3.111.198.152\
+       			ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/feedback.pem ec2-user@13.201.34.51\
         		"aws ecr get-login-password --region ap-south-1 | \
         		docker login --username AWS --password-stdin 650532568136.dkr.ecr.ap-south-1.amazonaws.com && \
         		docker pull 650532568136.dkr.ecr.ap-south-1.amazonaws.com/feedbackhub:latest && \

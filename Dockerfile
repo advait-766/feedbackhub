@@ -1,30 +1,17 @@
 # ----------------------------------------
 # Base image
 # ----------------------------------------
-FROM python:3.4-slim
+# Change from 3.4 to 3.9 (or 3.8)
+FROM python:3.9-slim
+
+# This will now build successfully on your EC2
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# ----------------------------------------
-# Runtime environment hardening
-# ----------------------------------------
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# ----------------------------------------
-# Working directory
-# ----------------------------------------
-# ... (Base image and deps stay the same)
-
 WORKDIR /app
-
-COPY app/requirements.txt .
+COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app/ .
-
-EXPOSE 5000
 
 CMD ["python", "app.py"]

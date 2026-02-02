@@ -31,7 +31,7 @@ csp = {
         '\'unsafe-inline\'' # For Tailwind dynamic colors
     ]
 }
-Talisman(app, force_https=False, content_security_policy=None)
+Talisman(app, content_security_policy=csp)
 
 # -------------------- DATABASE INIT --------------------
 def get_db():
@@ -352,4 +352,4 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

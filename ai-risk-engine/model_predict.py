@@ -17,14 +17,15 @@ except Exception:
 
 model = joblib.load(MODEL_PATH)
 
-prediction = model.predict(features)[0]
+# ... existing code ...
 risk_prob = model.predict_proba(features)[0][1]
-
 print(f"[AI] Risk probability: {risk_prob:.2f}")
 
-if prediction == 1:
-    print("[AI] DEPLOYMENT BLOCKED")
-    sys.exit(1)
+THRESHOLD = 0.40 
+
+if risk_prob > THRESHOLD:
+    print("[AI] DEPLOYMENT BLOCKED - Risk score too high")
+    sys.exit(1) # Signal failure to Jenkins
 else:
     print("[AI] DEPLOYMENT APPROVED")
     sys.exit(0)

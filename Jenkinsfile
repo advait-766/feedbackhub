@@ -64,30 +64,37 @@ pipeline {
         }
 
         stage("AI Risk Gate") {
-    	    steps {
+    	     steps {
         	sh '''
-        	# 1. Define base directory to avoid typing it every time
-        	APP_DIR="/home/v2077/Desktop/feedbackhub"
-        	PYTHON_BIN="$APP_DIR/venv/bin/python"
+       		# 1. Define paths
+       		WORKSPACE_DIR=$(pwd)
+       		APP_DIR="/home/v2077/Desktop/feedbackhub"
+       		PYTHON_BIN="$APP_DIR/venv/bin/python"
+       
+       		echo "[DEBUG] Current Workspace: $WORKSPACE_DIR"
+	
+       		# 2. IMPORTANT: Copy the JSON reports generated in previous stages to the AI engine folder
+       		# This ensures extract_features.py actually sees the data        		
+       		cp $WORKSPACE_DIR/gitleaks.json $APP_DIR/gitleaks.json || echo "Gitleaks report missing"
+        	cp $WORKSPACE_DIR/semgrep.json $APP_DIR/semgrep.json || echo "Semgrep report missing"
+       		
+       		# 3. Enter the AI Engine directory
+       		cd $APP_DIR
+       
+       		# 4. Run Trivy FS (this generates a NEW trivy.json inside APP_DIR)
+       		trivy fs --skip-dirs venv --severity CRITICAL,HIGH --format json --output trivy.json .
+       	
+       		# 5. Extract Features
+       		echo "[AI] Extracting features..."
+       		FEATURES=$($PYTHON_BIN $APP_DIR/ai-risk-engine/extract_features.py)
+       		echo "[AI] Features: $FEATURES"
         
-        	# 2. Enter the directory
-        	cd $APP_DIR
-        
-        	# 3. Clean and Scan (Skip venv to avoid scanning thousands of library files)
-        	rm -f trivy.json semgrep.json
-        	trivy fs --skip-dirs venv --severity CRITICAL,HIGH --format json --output trivy.json .
-        
-        	# 4. Extract Features (Using FULL path to the script)
-        	echo "[AI] Extracting features..."
-        	FEATURES=$($PYTHON_BIN $APP_DIR/ai-risk-engine/extract_features.py)
-        	echo "[AI] Features: $FEATURES"
-        
-        	# 5. Evaluate Risk (Using FULL path to the script)
-        	echo "[AI] Evaluating risk..."
-        	$PYTHON_BIN $APP_DIR/ai-risk-engine/model_predict.py $FEATURES
-        	'''
-   	   }
-	}
+       		# 6. Evaluate Risk
+       		echo "[AI] Evaluating risk..."
+       		$PYTHON_BIN $APP_DIR/ai-risk-engine/model_predict.py $FEATURES
+           	'''
+    	       }
+	   }
 
         stage("Login to AWS ECR") {
             steps {

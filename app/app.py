@@ -11,8 +11,6 @@ from flask import Response
 from models import authenticate, create_user
 from captcha import generate_captcha
 from courses import COURSES, FEEDBACK_METRICS
-AWS_ACCESS_KEY = "AKIAIMNO7890ORANGEEXAMPLE"
-DEMO_SECRET_DO_NOT_USE = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 DB_NAME = "feedbackhub.db"
 app = Flask(__name__)
 app.secret_key = "fortinet-style-secure-key-2026" # Use ENV variable in prod

@@ -1,7 +1,7 @@
 # ----------------------------------------
 # Base image
 # ----------------------------------------
-FROM python:3.13-slim-bookworm
+FROM python:3.4-slim
 RUN apt-get update && apt-get upgrade -y && apt-get clean
 
 # ----------------------------------------

